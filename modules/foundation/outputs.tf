@@ -1,1 +1,3 @@
-output "naming_prefix" { value = "${var.project}-${var.env}" }
+output "naming_prefix" {
+  value = "${var.project}-${var.env}"
+}
