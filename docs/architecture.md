@@ -14,13 +14,13 @@ shared conventions without copying boilerplate.
 ## Components
 
 - Root module: represents a service or environment using the shared foundation.
-- Foundation module: owns shared naming and tag inputs.
+- Foundation module: owns shared naming, tag inputs, and environment validation.
 - Terraform CI: validates formatting and module structure.
 
 ## Data Flow
 
 The root module passes `project`, `env`, and tags into `modules/foundation`. The module returns
-a `naming_prefix` output that callers can use consistently.
+a `naming_prefix` output and merged `common_tags` that callers can use consistently.
 
 ## Design Choices
 

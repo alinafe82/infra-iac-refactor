@@ -25,10 +25,12 @@ The GitHub Actions workflow runs the same validation for the root module and the
 
 - `main.tf` wires the root module to `modules/foundation`.
 - `variables.tf` holds caller-facing inputs.
-- `modules/foundation` owns shared naming/tagging conventions.
+- `modules/foundation` owns shared naming, environment validation, and tagging conventions.
 - `.github/workflows/terraform.yml` checks formatting and validation.
 
 See [docs/architecture.md](docs/architecture.md) for design details.
+See [docs/runbook.md](docs/runbook.md), [docs/security-notes.md](docs/security-notes.md),
+and [docs/production-readiness.md](docs/production-readiness.md) for operational notes.
 
 ## Limitations
 

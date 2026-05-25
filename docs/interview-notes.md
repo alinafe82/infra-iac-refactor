@@ -23,6 +23,13 @@ landing zone or production AWS foundation.
 - Added `.gitignore` for Terraform state and local artifacts.
 - Added architecture notes, ADR, and interview notes.
 
+## Fixes Made During Productionization
+
+- Added Terraform input validation for region, project, and environment.
+- Added a shared `common_tags` output so the module demonstrates a useful convention, not only a
+  naming prefix.
+- Added production-readiness, security, runbook, and core design ADR docs.
+
 ## Likely Questions
 
 **Why not build a larger module?**
