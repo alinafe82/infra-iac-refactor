@@ -11,3 +11,7 @@ module "foundation" {
 output "naming_prefix" {
   value = module.foundation.naming_prefix
 }
+
+output "common_tags" {
+  value = module.foundation.common_tags
+}
