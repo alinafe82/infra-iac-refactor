@@ -1,4 +1,10 @@
-# Placeholder for shared networking/logging conventions.
 locals {
-  prefix = "${var.project}-${var.env}"
+  common_tags = merge(
+    var.tags,
+    {
+      project     = var.project
+      environment = var.env
+      managed_by  = "terraform"
+    }
+  )
 }
