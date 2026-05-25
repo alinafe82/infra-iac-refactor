@@ -28,6 +28,7 @@ landing zone or production AWS foundation.
 - Added Terraform input validation for region, project, and environment.
 - Added a shared `common_tags` output so the module demonstrates a useful convention, not only a
   naming prefix.
+- Added `terraform test` coverage for outputs and invalid environment input.
 - Added production-readiness, security, runbook, and core design ADR docs.
 
 ## Likely Questions

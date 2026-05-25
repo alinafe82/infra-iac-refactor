@@ -6,6 +6,7 @@
 terraform init -backend=false
 terraform fmt -check -recursive
 terraform validate
+terraform test
 ```
 
 Validate the nested module directly:
@@ -15,6 +16,7 @@ cd modules/foundation
 terraform init -backend=false
 terraform fmt -check -recursive
 terraform validate
+terraform test
 ```
 
 ## Test

@@ -17,9 +17,11 @@ in CI.
 terraform init -backend=false
 terraform fmt -check -recursive
 terraform validate
+terraform test
 ```
 
-The GitHub Actions workflow runs the same validation for the root module and the nested module.
+The GitHub Actions workflow runs formatting, validation, `terraform test`, and nested module
+validation.
 
 ## Architecture Overview
 
