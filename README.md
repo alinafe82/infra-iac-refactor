@@ -1,15 +1,25 @@
 # infra-iac-refactor
-Small Terraform refactor example for shared infrastructure conventions.
 
-This repo shows a minimal before/after shape for pulling repeated infrastructure conventions
-into a shared `foundation` module. The resources are intentionally minimal so the repo can be
-reviewed without provisioning cloud infrastructure.
+A small Terraform refactor that pulls naming, environment validation, and tagging conventions out of every service module and into one `foundation` module that callers consume.
 
-## What It Solves
+The resources are deliberately minimal. The repo can be reviewed end-to-end without `terraform apply` ever touching a cloud account.
 
-Repeated Terraform snippets make naming, tagging, and environment defaults drift across
-services. This example centralizes those conventions behind a module and validates the result
-in CI.
+## Why centralize this
+
+Three services that each define their own tag map will drift. One forgets `environment`. Another spells `managed_by` differently. A fourth ships a new tag and nobody propagates it. Centralizing the small things — naming prefix, environment whitelist, default tag set — removes the drift surface without locking callers into a heavyweight platform module.
+
+The `foundation` module exposes two things and nothing else:
+
+- `naming_prefix` (string like `platform-foundation-stage`)
+- `common_tags` (map merged with caller-supplied overrides)
+
+That is the smallest useful surface for the problem.
+
+## What I would not centralize
+
+- Network topology, IAM policies, KMS keys. Those are not "shared conventions"; they are real resources that need real review and per-service tuning.
+- Provider versions. Pinning belongs to the consuming service so platform upgrades roll out one service at a time.
+- Anything that requires the foundation to know about a specific cloud service. The foundation has no `aws_*` resources for a reason.
 
 ## Quickstart
 
@@ -20,32 +30,42 @@ terraform validate
 terraform test
 ```
 
-The GitHub Actions workflow runs formatting, validation, `terraform test`, and nested module
-validation.
+CI runs the same four commands plus a nested-module validation pass.
 
-## Architecture Overview
+## Module boundary
 
-- `main.tf` wires the root module to `modules/foundation`.
-- `variables.tf` holds caller-facing inputs.
-- `modules/foundation` owns shared naming, environment validation, and tagging conventions.
-- `.github/workflows/terraform.yml` checks formatting and validation.
+- `modules/foundation/variables.tf` enforces project-name regex and a closed set of environments (`dev`, `stage`, `prod`).
+- `modules/foundation/outputs.tf` exposes `naming_prefix` and `common_tags`.
+- `main.tf` is the consumer example. It calls `module.foundation` the way a real service module would.
+- `.github/workflows/terraform.yml` runs the test suite on every push.
 
-See [docs/architecture.md](docs/architecture.md) for design details.
-See [docs/runbook.md](docs/runbook.md), [docs/security-notes.md](docs/security-notes.md),
-and [docs/production-readiness.md](docs/production-readiness.md) for operational notes.
+Design rationale lives in [docs/architecture.md](docs/architecture.md).
 
-## Limitations
+## Tests
 
-- This is an illustrative refactor, not a full AWS foundation.
-- It does not create real networking, IAM, or logging resources.
-- Terraform is not installed by the repo; CI installs it through `hashicorp/setup-terraform`.
+`tests/foundation.tftest.hcl` covers:
 
-## Future Improvements
+- output stability: `naming_prefix` and `common_tags` match expected values for known inputs.
+- invalid environment rejection (e.g., `env = "qa"`).
 
-- Add examples for two service modules consuming the same foundation module.
-- Add `terraform test` when module behavior grows beyond simple outputs.
-- Add policy checks if the repo starts modeling real resources.
+Next validation steps (not yet shipped):
 
-## Interview Notes
+- invalid project-name rejection at the root variable boundary.
+- caller-tag merge semantics (caller can extend, but cannot override `project`, `environment`, `managed_by`).
 
-See [docs/interview-notes.md](docs/interview-notes.md).
+## Adapter work left before this could provision real AWS
+
+This repo deliberately stops short. To use it against a real account you would need:
+
+- A provider block scoped to a region with backend state.
+- A consumer module per service (e.g., `modules/example-service-a` and `modules/example-service-b`) that calls `foundation` and then declares the real resources.
+- A policy-check pass (tflint, checkov, or sentinel) wired into CI.
+
+The repo has none of those on purpose. The point is the convention layer, not the resource catalog.
+
+## Operational notes
+
+- [docs/runbook.md](docs/runbook.md)
+- [docs/security-notes.md](docs/security-notes.md)
+- [docs/production-readiness.md](docs/production-readiness.md)
+- [docs/interview-notes.md](docs/interview-notes.md)
