@@ -6,7 +6,7 @@ languages touched by the change.
 ## Required Gates
 
 - Start from the default branch and keep the PR focused on one reviewable change.
-- Run `git diff --check` before committing.
+- Run `git diff --check` and `git diff --cached --check` before committing.
 - Run `repowave scan .` when `repowave.toml` is present.
 - Run every applicable language command below. If a command needs credentials, a live service, or unavailable
   platform tooling, state that in the PR and run the closest local gate.
@@ -23,6 +23,9 @@ languages touched by the change.
 
 ## Current Command Map
 
-- Diff gate: `git diff --check`.
+- Diff gate: `git diff --check` and `git diff --cached --check`.
 - Repository readiness: `repowave scan .`.
+- Terraform format: `terraform fmt -check -recursive`.
+- Terraform root validation: `terraform init -backend=false`, `terraform validate`, and `terraform test`.
+- Terraform module validation: `cd modules/foundation && terraform init -backend=false && terraform fmt -check -recursive && terraform validate`.
 - Markdown review: verify command examples, links, and file paths changed in the PR.
