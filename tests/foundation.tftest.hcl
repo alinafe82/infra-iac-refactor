@@ -41,3 +41,25 @@ run "invalid_environment_is_rejected" {
     var.env,
   ]
 }
+
+run "blank_tag_value_is_rejected" {
+  command = plan
+  variables {
+    project = "platform-foundation"
+    env     = "dev"
+    region  = "us-west-2"
+    tags    = { owner = "   " }
+  }
+  expect_failures = [var.tags]
+}
+
+run "reserved_tag_override_is_rejected" {
+  command = plan
+  variables {
+    project = "platform-foundation"
+    env     = "dev"
+    region  = "us-west-2"
+    tags    = { managed_by = "manual" }
+  }
+  expect_failures = [var.tags]
+}
