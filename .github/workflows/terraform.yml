@@ -25,15 +25,19 @@ jobs:
         shell: bash
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v6
+        with:
+          persist-credentials: false
       - name: Set up Terraform
         uses: hashicorp/setup-terraform@dfe3c3f87815947d99a8997f908cb6525fc44e9e # v4
         with:
-          terraform_version: 1.15.8
+          terraform_version: 1.15.9
           terraform_wrapper: false
       - name: Check formatting
         run: terraform fmt -check -recursive
       - name: Initialize without backend
-        run: terraform init -backend=false
+        run: terraform init -backend=false -input=false
+      - name: Verify provider lock file is current
+        run: git diff --exit-code -- .terraform.lock.hcl
       - name: Validate root module
         run: terraform validate
       - name: Run module tests
@@ -41,6 +45,6 @@ jobs:
       - name: Validate reusable foundation module
         working-directory: modules/foundation
         run: |
-          terraform init -backend=false
+          terraform init -backend=false -input=false
           terraform fmt -check -recursive
           terraform validate
